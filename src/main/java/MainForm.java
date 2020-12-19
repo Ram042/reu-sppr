@@ -13,8 +13,8 @@ public class MainForm extends JFrame {
     private final CalculationModel calculationModel;
     private final CalculationView calculationView;
     boolean inputPanelRebuildRequired = true;
-    private JTable alternativesTable;
-    private JTable criterionTable;
+    private final JTable alternativesTable;
+    private final JTable criterionTable;
     private SpinnerWithLabel alternativesSpinner;
     private SpinnerWithLabel criterionSpinner;
     private SpinnerWithLabel maxSpinner;
@@ -35,11 +35,15 @@ public class MainForm extends JFrame {
         inputPanel.addChangeListener(calculationModel::setValue);
         calculationView = new CalculationView(calculationModel);
 
+        alternativesTable = new JTable(alternativeTableModel);
+        criterionTable = new JTable(criterionTableModel);
+
         //form
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setTitle("СППР");
         setSize(800, 600);
+        setMinimumSize(new Dimension(500, 450));
 
         getContentPane().add(tabbedPane);
 
@@ -72,6 +76,12 @@ public class MainForm extends JFrame {
             criterionSpinner.submit();
             maxSpinner.submit();
             minSpinner.submit();
+            if (alternativesTable.getCellEditor() != null) {
+                alternativesTable.getCellEditor().stopCellEditing();
+            }
+            if (criterionTable.getCellEditor() != null) {
+                criterionTable.getCellEditor().stopCellEditing();
+            }
         });
 
         setVisible(true);
@@ -91,11 +101,10 @@ public class MainForm extends JFrame {
                     if (alternativesTable.getCellEditor() != null) {
                         alternativesTable.getCellEditor().cancelCellEditing();
                     }
-                    System.out.println(e);
                     ((SingleColumnTableModel) alternativesTable.getModel())
                             .setCount((Integer) ((JSpinner) e.getSource()).getValue());
                     inputPanelRebuildRequired = true;
-                }, 1, 1, 20, 1
+                }, 2, 2, 20, 1
         );
         panel.add(alternativesSpinner);
 
@@ -105,11 +114,10 @@ public class MainForm extends JFrame {
                     if (criterionTable.getCellEditor() != null) {
                         criterionTable.getCellEditor().cancelCellEditing();
                     }
-                    System.out.println(e);
                     ((SingleColumnTableModel) criterionTable.getModel())
                             .setCount(((Integer) ((JSpinner) e.getSource()).getValue()));
                     inputPanelRebuildRequired = true;
-                }, 1, 1, 20, 1
+                }, 2, 2, 20, 1
         );
         panel.add(criterionSpinner);
 
@@ -139,36 +147,38 @@ public class MainForm extends JFrame {
     }
 
     void initAlternativesTab() {
-        JPanel panel = new JPanel();
-        tabbedPane.addTab("Альтернативы", panel);
+        var panel = new JPanel(new MigLayout(""));
+        tabbedPane.addTab("Альтернативы", new JScrollPane(panel));
 
-        alternativesTable = new JTable();
-        alternativesTable.setModel(alternativeTableModel);
-        panel.add(alternativesTable);
+        panel.add(alternativesTable, "width 400px");
         tabbedPane.addChangeListener(e -> {
             if (alternativesTable.getCellEditor() != null) {
                 alternativesTable.getCellEditor().stopCellEditing();
             }
         });
+        alternativesTable.getModel().addTableModelListener(e -> {
+            inputPanelRebuildRequired = true;
+        });
     }
 
     void initCriterionTab() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new MigLayout("", "[shrink][]", "[][][grow]"));
         tabbedPane.addTab("Критерии", panel);
 
-        criterionTable = new JTable();
-        criterionTable.setModel(criterionTableModel);
         criterionTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        panel.add(criterionTable);
+        panel.add(criterionTable, "spany 2, height pref,width 400px");
 
         tabbedPane.addChangeListener(e -> {
             if (criterionTable.getCellEditor() != null) {
                 criterionTable.getCellEditor().stopCellEditing();
             }
         });
+        criterionTable.getModel().addTableModelListener(e -> {
+            inputPanelRebuildRequired = true;
+        });
 
         var upButton = new BasicArrowButton(SwingConstants.NORTH);
-        panel.add(upButton);
+        panel.add(upButton, "wrap, pushy 1,bottom, w 20px, h 20px");
         upButton.addActionListener(e -> {
             var row = criterionTable.getSelectedRow();
 
@@ -184,7 +194,7 @@ public class MainForm extends JFrame {
         });
 
         var downButton = new BasicArrowButton(SwingConstants.SOUTH);
-        panel.add(downButton);
+        panel.add(downButton, "pushy 1,top, w 20px, h 20px");
         downButton.addActionListener(e -> {
             var row = criterionTable.getSelectedRow();
 
