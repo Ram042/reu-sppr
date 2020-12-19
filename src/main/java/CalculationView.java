@@ -48,7 +48,7 @@ public class CalculationView {
         }
 
         content.removeAll();
-        content.add(new JLabel("Ранжирование альтернатив"),"wrap");
+        content.add(new JLabel("Ранжирование альтернатив"), "wrap");
         content.add(new JScrollPane(new JTable(values, new Object[]{"Альтернатива", "Ранг"})));
     }
 

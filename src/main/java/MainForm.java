@@ -1,4 +1,3 @@
-import components.SpinnerWithLabel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -8,22 +7,18 @@ import java.awt.*;
 public class MainForm extends JFrame {
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
-    private JTable alternativesTable;
-
     private final SingleColumnTableModel alternativeTableModel;
-    private JTable criterionTable;
     private final SingleColumnTableModel criterionTableModel;
-
     private final InputPanel inputPanel;
     private final CalculationModel calculationModel;
-
     private final CalculationView calculationView;
+    boolean inputPanelRebuildRequired = true;
+    private JTable alternativesTable;
+    private JTable criterionTable;
     private SpinnerWithLabel alternativesSpinner;
     private SpinnerWithLabel criterionSpinner;
     private SpinnerWithLabel maxSpinner;
     private SpinnerWithLabel minSpinner;
-
-    boolean inputPanelRebuildRequired = true;
 
     public MainForm() throws HeadlessException {
         super();

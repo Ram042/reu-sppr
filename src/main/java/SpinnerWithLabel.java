@@ -1,5 +1,3 @@
-package components;
-
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -29,7 +27,7 @@ public class SpinnerWithLabel extends JPanel {
         spinner.setValue(value);
     }
 
-    public void submit()  {
+    public void submit() {
         try {
             spinner.commitEdit();
         } catch (ParseException e) {

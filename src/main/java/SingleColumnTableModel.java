@@ -9,12 +9,12 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 public class SingleColumnTableModel extends AbstractTableModel {
     private final List<String> rows;
 
-    public List<String> getRows() {
-        return rows;
-    }
-
     public SingleColumnTableModel(List<String> rows) {
         this.rows = rows;
+    }
+
+    public List<String> getRows() {
+        return rows;
     }
 
     public void setCount(int count) {

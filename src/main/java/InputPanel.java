@@ -18,6 +18,20 @@ public class InputPanel extends JScrollPane {
     private final SliderValueSupplier sliderValueSupplier;
     private int minValue;
     private int maxValue;
+    @Nullable
+    private Hashtable<Integer, JLabel> labelTable;
+
+    public InputPanel(List<String> alternatives, List<String> criterion, SliderValueSupplier sliderValueSupplier, int minValue, int maxValue) {
+        super(null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
+        this.alternatives = alternatives;
+        this.criterion = criterion;
+        this.sliderValueSupplier = sliderValueSupplier;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        getVerticalScrollBar().setUnitIncrement(16);
+        contentPanel = new JPanel(new MigLayout("flowy, fill", "[fill]"));
+        setViewportView(contentPanel);
+    }
 
     public int getMinValue() {
         return minValue;
@@ -33,18 +47,6 @@ public class InputPanel extends JScrollPane {
 
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
-    }
-
-    public InputPanel(List<String> alternatives, List<String> criterion, SliderValueSupplier sliderValueSupplier, int minValue, int maxValue) {
-        super(null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
-        this.alternatives = alternatives;
-        this.criterion = criterion;
-        this.sliderValueSupplier = sliderValueSupplier;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        getVerticalScrollBar().setUnitIncrement(16);
-        contentPanel = new JPanel(new MigLayout("flowy, fill", "[fill]"));
-        setViewportView(contentPanel);
     }
 
     public void rebuild() {
@@ -93,10 +95,6 @@ public class InputPanel extends JScrollPane {
         });
     }
 
-
-    @Nullable
-    private Hashtable<Integer, JLabel> labelTable;
-
     void updateLabelTable() {
         if (maxValue - minValue <= 30) {
             labelTable = null;
@@ -105,7 +103,7 @@ public class InputPanel extends JScrollPane {
             int d = (maxValue - minValue) / 25;
 
             for (int i = minValue; i < maxValue; i += d) {
-                if (maxValue-i>=d){
+                if (maxValue - i >= d) {
                     labelTable.put(i, new JLabel(Integer.toString(i)));
                 }
             }
