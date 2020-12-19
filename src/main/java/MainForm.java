@@ -1,3 +1,4 @@
+import components.SpinnerWithLabel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -13,13 +14,16 @@ public class MainForm extends JFrame {
     private JTable criterionTable;
     private final SingleColumnTableModel criterionTableModel;
 
-    private JSpinner alternativeCountSelector;
-
-    private JSpinner criterionCountSelector;
-    private final InputPanelView inputPanelManager;
+    private final InputPanel inputPanel;
     private final CalculationModel calculationModel;
 
     private final CalculationView calculationView;
+    private SpinnerWithLabel alternativesSpinner;
+    private SpinnerWithLabel criterionSpinner;
+    private SpinnerWithLabel maxSpinner;
+    private SpinnerWithLabel minSpinner;
+
+    boolean inputPanelRebuildRequired = true;
 
     public MainForm() throws HeadlessException {
         super();
@@ -28,7 +32,12 @@ public class MainForm extends JFrame {
         alternativeTableModel = new SingleColumnTableModel(calculationModel.getAlternativeList());
         criterionTableModel = new SingleColumnTableModel(calculationModel.getCriterionList());
 
-        inputPanelManager = new InputPanelView(alternativeTableModel, criterionTableModel, calculationModel);
+        inputPanel = new InputPanel(
+                calculationModel.getAlternativeList(),
+                calculationModel.getCriterionList(),
+                calculationModel::getValue,
+                1, 10);
+        inputPanel.addChangeListener(calculationModel::setValue);
         calculationView = new CalculationView(calculationModel);
 
         //form
@@ -46,13 +55,16 @@ public class MainForm extends JFrame {
         initInputTab();
         initCalculationTab();
 
-        //init alternatives table
-        alternativeCountSelector.getChangeListeners()[0].stateChanged(null);
-        criterionCountSelector.getChangeListeners()[0].stateChanged(null);
+        //init tables
+        alternativesSpinner.setValue(3);
+        criterionSpinner.setValue(3);
+        minSpinner.setValue(1);
+        maxSpinner.setValue(10);
 
         tabbedPane.addChangeListener(e -> {
-            if (tabbedPane.getSelectedIndex() == 3) {
-                inputPanelManager.rebuild();
+            if (tabbedPane.getSelectedIndex() == 3 && inputPanelRebuildRequired) {
+                inputPanel.rebuild();
+                inputPanelRebuildRequired = false;
             }
         });
         tabbedPane.addChangeListener(e -> {
@@ -60,52 +72,71 @@ public class MainForm extends JFrame {
                 calculationView.rebuild();
             }
         });
+        tabbedPane.addChangeListener(e -> {
+            alternativesSpinner.submit();
+            criterionSpinner.submit();
+            maxSpinner.submit();
+            minSpinner.submit();
+        });
 
         setVisible(true);
     }
 
     private void initInputTab() {
-        tabbedPane.addTab("Ввод данных", inputPanelManager.getPanel());
+        tabbedPane.addTab("Ввод данных", inputPanel);
     }
 
     void initBasicInfoTab() {
-        var panel = new JPanel(new MigLayout());
+        var panel = new JPanel(new MigLayout("wrap 1"));
         tabbedPane.addTab("Настройки", panel);
 
-        //region alternative count selector
-        JPanel alternativeCountPanel = new JPanel();
+        alternativesSpinner = new SpinnerWithLabel(
+                "Количество альтернатив",
+                e -> {
+                    if (alternativesTable.getCellEditor() != null) {
+                        alternativesTable.getCellEditor().cancelCellEditing();
+                    }
+                    System.out.println(e);
+                    ((SingleColumnTableModel) alternativesTable.getModel())
+                            .setCount((Integer) ((JSpinner) e.getSource()).getValue());
+                    inputPanelRebuildRequired = true;
+                }, 1, 1, 20, 1
+        );
+        panel.add(alternativesSpinner);
 
-        alternativeCountSelector = new JSpinner(new SpinnerNumberModel(3, 1, 20, 1));
-        alternativeCountSelector.addChangeListener(e -> {
-            if (alternativesTable.getCellEditor() != null) {
-                alternativesTable.getCellEditor().cancelCellEditing();
-            }
-            ((SingleColumnTableModel) alternativesTable.getModel())
-                    .setCount((int) alternativeCountSelector.getModel().getValue());
-        });
+        criterionSpinner = new SpinnerWithLabel(
+                "Количество критериев",
+                e -> {
+                    if (criterionTable.getCellEditor() != null) {
+                        criterionTable.getCellEditor().cancelCellEditing();
+                    }
+                    System.out.println(e);
+                    ((SingleColumnTableModel) criterionTable.getModel())
+                            .setCount(((Integer) ((JSpinner) e.getSource()).getValue()));
+                    inputPanelRebuildRequired = true;
+                }, 1, 1, 20, 1
+        );
+        panel.add(criterionSpinner);
 
-        alternativeCountPanel.add(new JLabel("Количество альтернатив"));
-        alternativeCountPanel.add(alternativeCountSelector);
-        panel.add(alternativeCountPanel);
-        //endregion
+        minSpinner = new SpinnerWithLabel(
+                "Минимальная оценка",
+                e -> {
+                    inputPanel.setMinValue((Integer) ((JSpinner) e.getSource()).getValue());
+                    inputPanelRebuildRequired = true;
+                },
+                0, -100, 100, 1
+        );
+        panel.add(minSpinner);
 
-
-        //region criterion count selector
-        JPanel criterionCountPanel = new JPanel();
-
-        criterionCountSelector = new JSpinner(new SpinnerNumberModel(3, 1, 20, 1));
-        criterionCountSelector.addChangeListener(e -> {
-            if (criterionTable.getCellEditor() != null) {
-                criterionTable.getCellEditor().cancelCellEditing();
-            }
-            ((SingleColumnTableModel) criterionTable.getModel())
-                    .setCount((int) criterionCountSelector.getModel().getValue());
-        });
-
-        criterionCountPanel.add(new JLabel("Количество критериев"));
-        criterionCountPanel.add(criterionCountSelector);
-        panel.add(criterionCountPanel);
-        //endregion
+        maxSpinner = new SpinnerWithLabel(
+                "Максимальная оценка",
+                e -> {
+                    inputPanel.setMaxValue((Integer) ((JSpinner) e.getSource()).getValue());
+                    inputPanelRebuildRequired = true;
+                },
+                0, -100, 100, 1
+        );
+        panel.add(maxSpinner);
     }
 
     void initCalculationTab() {
