@@ -194,7 +194,7 @@ public class MainForm extends JFrame {
             if (criterionTable.getCellEditor() != null) {
                 criterionTable.getCellEditor().stopCellEditing();
             }
-            alternativeTableModel.swap(row + 1, row);
+            criterionTableModel.swap(row + 1, row);
 
             criterionTable.setRowSelectionInterval(row + 1, row + 1);
         });
