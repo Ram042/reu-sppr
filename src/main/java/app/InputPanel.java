@@ -1,3 +1,5 @@
+package app;
+
 import net.miginfocom.swing.MigLayout;
 
 import javax.annotation.Nullable;
@@ -20,7 +22,6 @@ public class InputPanel extends JScrollPane {
     private int maxValue;
     @Nullable
     private Hashtable<Integer, JLabel> labelTable;
-
     public InputPanel(List<String> alternatives, List<String> criterion, SliderValueSupplier sliderValueSupplier, int minValue, int maxValue) {
         super(null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
         this.alternatives = alternatives;

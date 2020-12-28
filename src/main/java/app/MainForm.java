@@ -1,3 +1,8 @@
+package app;
+
+import app.components.CheckBoxWithLabel;
+import app.components.SingleColumnTableModel;
+import app.components.SpinnerWithLabel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -19,6 +24,7 @@ public class MainForm extends JFrame {
     private SpinnerWithLabel criterionSpinner;
     private SpinnerWithLabel maxSpinner;
     private SpinnerWithLabel minSpinner;
+    private CheckBoxWithLabel paretoFilterCheckbox;
 
     public MainForm() throws HeadlessException {
         super();
@@ -41,14 +47,14 @@ public class MainForm extends JFrame {
         //form
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setTitle("СППР");
+        setTitle("Лексикографический метод © Хамитов Рамиль 2020");
         setSize(800, 600);
         setMinimumSize(new Dimension(500, 450));
 
         getContentPane().add(tabbedPane);
 
         //tabs
-        initBasicInfoTab();
+        initSettingsTab();
         initAlternativesTab();
         initCriterionTab();
         initInputTab();
@@ -59,6 +65,7 @@ public class MainForm extends JFrame {
         criterionSpinner.setValue(3);
         minSpinner.setValue(1);
         maxSpinner.setValue(10);
+        paretoFilterCheckbox.setValue(true);
 
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 3 && inputPanelRebuildRequired) {
@@ -91,7 +98,7 @@ public class MainForm extends JFrame {
         tabbedPane.addTab("Ввод данных", inputPanel);
     }
 
-    void initBasicInfoTab() {
+    void initSettingsTab() {
         var panel = new JPanel(new MigLayout("wrap 1"));
         tabbedPane.addTab("Настройки", panel);
 
@@ -140,6 +147,13 @@ public class MainForm extends JFrame {
                 0, -100, 100, 1
         );
         panel.add(maxSpinner);
+
+        paretoFilterCheckbox = new CheckBoxWithLabel("Выделять множество парето",
+                e -> {
+                    calculationView.setParetoFilter(((JCheckBox) e.getSource()).isSelected());
+                    inputPanelRebuildRequired=true;
+                });
+        panel.add(paretoFilterCheckbox);
     }
 
     void initCalculationTab() {

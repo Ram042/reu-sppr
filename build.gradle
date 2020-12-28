@@ -7,7 +7,7 @@ plugins {
 }
 
 run {
-    mainClassName = 'Main'
+    mainClassName = 'app.Main'
 }
 
 repositories {
@@ -15,15 +15,17 @@ repositories {
 }
 
 dependencies {
-    compile 'org.openjfx:javafx-swing:15'
-    compile 'com.google.guava:guava:30.1-jre'
-    compile 'com.miglayout:miglayout-swing:5.2'
-    compile 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.openjfx:javafx-swing:15'
+    implementation 'com.google.guava:guava:30.1-jre'
+    implementation 'com.miglayout:miglayout-swing:5.2'
+    implementation 'org.apache.commons:commons-lang3:3.11'
 }
 
 launch4j {
-    mainClassName = 'Main'
+    mainClassName = 'app.Main'
     bundledJrePath = "jre"
+    dontWrapJar = true
+    jreRuntimeBits = "32"
 }
 
 task downloadJre(type: Download) {

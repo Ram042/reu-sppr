@@ -1,3 +1,5 @@
+package app.components;
+
 import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.swing.table.AbstractTableModel;
